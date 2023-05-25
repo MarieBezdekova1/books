@@ -1,54 +1,67 @@
 package com.bezdekova.book;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Value;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = BookStoreApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BookStoreApplicationTests {
 
-    @Value(value="${local.server.port}")
+    @LocalServerPort
     private int port;
 
     TestRestTemplate restTemplate = new TestRestTemplate();
 
-    HttpHeaders headers = new HttpHeaders();
-
+    private String book1 = "{\"name\":\"Babicka\",\"price\":120}";
+    private String book2 = "{\"name\":\"Diva Bara\",\"price\":420}";
+    private String book3 = "{\"name\":\"Psohlavci\",\"price\":300}";
+    
     @Test
     public void testRetrieveAllBooks() throws JSONException {
 
-        HttpEntity<String> entity = new HttpEntity<>(null, headers);
-
         ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort("/books"),
-                HttpMethod.GET, entity, String.class);
+                HttpMethod.GET, null, String.class);  
+        
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");   
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
 
-        String responseBody = response.getBody();        
+        String responseBody = response.getBody();      
+        assertNotNull(responseBody, "Response should not be null.");
 
-        ArrayList<String> expected = new ArrayList<>();
-        expected.add("{\"name\":\"Babicka\",\"price\":120}");
-        expected.add("{\"name\":\"Diva Bara\",\"price\":120}");
+        List<String> expected = List.of(book1, book2, book3);
+        JSONAssert.assertEquals(expected.toString(), responseBody, false);
+    }
 
-        assertEquals(response.getStatusCode().value(), 200, "Response should be 200");
-        assertNotNull(responseBody, "Response should not be null");
-        assertFalse(response.getBody().length() > 0);
+    @Test
+    public void testRetrieveAllAuthors() throws JSONException {
 
-        //JSONAssert.assert(, 200, false);
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURLWithPort("/authors"),
+                HttpMethod.GET, null, String.class);  
+        
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");   
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
+
+        String responseBody = response.getBody();      
+        assertNotNull(responseBody, "Response should not be null.");
+
+        String author1 = "{\"name\":\"Bozena Nemcova\",\"books\":[" + book1 + ", " +  book2 + "]}";
+        String author2 = "{\"name\":\"Alois Jirasek\",\"books\":[" + book3 + "]}";
+        List<String> expected = List.of(author1, author2);
+        JSONAssert.assertEquals(expected.toString(), responseBody, false);
     }
 
     private String createURLWithPort(String uri) {
