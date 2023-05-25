@@ -1,6 +1,10 @@
 package com.bezdekova.book;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -13,6 +17,9 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "authors")
+@JsonIdentityInfo(
+  generator = ObjectIdGenerators.PropertyGenerator.class, 
+  property = "id")
 public class Author {
 
     @Id
@@ -39,7 +46,7 @@ public class Author {
     }
 
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)
-    private Set<Book> books;
+            cascade = CascadeType.ALL)     
+    private Set<Book> books = new HashSet<>();
     
 }
