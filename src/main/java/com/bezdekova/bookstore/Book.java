@@ -1,4 +1,4 @@
-package com.bezdekova.book;
+package com.bezdekova.bookstore;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

@@ -1,4 +1,4 @@
-package com.bezdekova.book;
+package com.bezdekova.bookstore;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,8 +22,7 @@ public class BookStoreApplication {
 			
 			bookRep.save(new Book("Babicka", author1, 120));
 			bookRep.save(new Book("Diva Bara", author1, 420));
-			bookRep.save(new Book("Psohlavci", author2, 300));
-			
+			bookRep.save(new Book("Psohlavci", author2, 300));		
 		};
 	}
 

@@ -1,4 +1,4 @@
-package com.bezdekova.book;
+package com.bezdekova.bookstore;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +23,9 @@ public class Author {
     @JsonIgnore
     private Long id;
     private String name;
+    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL)     
+    private Set<Book> books = new HashSet<>();
 
     protected Author() {}
 
@@ -42,10 +45,6 @@ public class Author {
     public String getName() {
         return name;
     }
-
-    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)     
-    private Set<Book> books = new HashSet<>();
 
     public Set<Book> getBooks() {
         return books;

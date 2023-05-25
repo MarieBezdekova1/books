@@ -1,4 +1,4 @@
-package com.bezdekova.book;
+package com.bezdekova.bookstore;
 
 import org.springframework.data.repository.CrudRepository;
 
