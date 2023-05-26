@@ -1,5 +1,8 @@
 package com.bezdekova.bookstore;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,8 +16,18 @@ public class AuthorController {
       }
 
     @GetMapping("/authors")
-    Iterable<Author> all() {
-        return repository.findAll();
+    public List<AuthorDto> getAllAuthors() {
+        Iterable<Author> authors = repository.findAll();
+        List<AuthorDto> authorDtos = new ArrayList<>();
+
+        for (Author author : authors) {
+            AuthorDto authorDto = new AuthorDto();
+            authorDto.setName(author.getName());
+            authorDto.setBooks(author.getBooks());
+            authorDtos.add(authorDto);
+        }
+
+        return authorDtos;
     }
    
 }

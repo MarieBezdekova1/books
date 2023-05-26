@@ -1,7 +1,5 @@
 package com.bezdekova.bookstore;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,14 +15,12 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @JsonIgnore
     private Long id;
     private String name;
     private Integer price;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
-    @JsonIgnore
     private Author author;
 
     protected Book() {}

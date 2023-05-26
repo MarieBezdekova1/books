@@ -3,8 +3,6 @@ package com.bezdekova.bookstore;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,7 +18,6 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    @JsonIgnore
     private Long id;
     private String name;
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER,

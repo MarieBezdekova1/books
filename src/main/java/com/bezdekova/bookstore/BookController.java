@@ -1,5 +1,8 @@
 package com.bezdekova.bookstore;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,8 +16,18 @@ public class BookController {
       }
 
     @GetMapping("/books")
-    Iterable<Book> all() {
-        return repository.findAll();
+    List<BookDto> getAllBooks() {
+        Iterable<Book> books = repository.findAll();
+        List<BookDto> bookDtos = new ArrayList<>();
+
+        for (Book book : books) {
+            BookDto bookDto = new BookDto();
+            bookDto.setName(book.getName());
+            bookDto.setPrice(book.getPrice());
+            bookDtos.add(bookDto);
+        }
+
+        return bookDtos;
     }
     
 }
