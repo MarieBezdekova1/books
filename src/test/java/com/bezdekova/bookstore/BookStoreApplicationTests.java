@@ -31,9 +31,7 @@ class BookStoreApplicationTests {
     @Test
     public void testRetrieveAllBooks() throws JSONException {
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/books"),
-                HttpMethod.GET, null, String.class);  
+        ResponseEntity<String> response = executeCall("/books");  
         
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");   
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
@@ -48,9 +46,7 @@ class BookStoreApplicationTests {
     @Test
     public void testRetrieveAllAuthors() throws JSONException {
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                createURLWithPort("/authors"),
-                HttpMethod.GET, null, String.class);  
+        ResponseEntity<String> response = executeCall("/authors");  
         
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");   
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
@@ -64,8 +60,10 @@ class BookStoreApplicationTests {
         JSONAssert.assertEquals(expected.toString(), responseBody, false);
     }
 
-    private String createURLWithPort(String uri) {
-        return "http://localhost:" + port + uri;
+    private ResponseEntity<String> executeCall(String uri) {
+        return restTemplate.exchange(
+            "http://localhost:" + port + uri,
+            HttpMethod.GET, null, String.class);  
     }
 
 }
