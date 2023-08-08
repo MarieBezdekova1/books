@@ -18,7 +18,7 @@ public class BookDto {
 
     public void setPrice(Integer price) {
         this.price = price;
-    };
+    }
 
     public String getName() {
         return name;

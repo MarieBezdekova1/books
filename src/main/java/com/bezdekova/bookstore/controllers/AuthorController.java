@@ -23,9 +23,7 @@ public class AuthorController {
     @GetMapping("/authors")
     public List<AuthorWithBooksDto> getAllAuthorsWithBooks() {
         List<Author> authors = repository.findAll();
-        List<AuthorWithBooksDto> authorWithBooksDtos = authorDtoMapper.authorsToAuthorsDtos(authors);
-
-        return authorWithBooksDtos;
+        return authorDtoMapper.authorsToAuthorsDtos(authors);
     }
 
     // TODO getAuthorsWithoutBooks

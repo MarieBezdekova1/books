@@ -24,9 +24,9 @@ class BookStoreApplicationTests {
 
     TestRestTemplate restTemplate = new TestRestTemplate();
 
-    private String book1 = "{\"name\":\"Babicka\",\"price\":150}";
-    private String book2 = "{\"name\":\"Diva Bara\",\"price\":450}";
-    private String book3 = "{\"name\":\"Psohlavci\",\"price\":300}";
+    private final String book1 = "{\"name\":\"Babicka\",\"price\":150}";
+    private final String book2 = "{\"name\":\"Diva Bara\",\"price\":450}";
+    private final String book3 = "{\"name\":\"Psohlavci\",\"price\":300}";
     
     @Test
     public void testRetrieveAllBooks() throws JSONException {

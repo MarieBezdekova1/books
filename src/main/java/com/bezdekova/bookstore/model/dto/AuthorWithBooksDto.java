@@ -20,7 +20,7 @@ public class AuthorWithBooksDto {
 
     public void setBooks(List<BookDto> books) {
         this.books = books;
-    };
+    }
 
     public String getName() {
         return name;
