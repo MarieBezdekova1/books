@@ -1,7 +1,7 @@
-package com.bezdekova.bookstore;
+package com.bezdekova.bookstore.db;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -17,12 +17,12 @@ import jakarta.persistence.Table;
 public class Author {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)     
-    private Set<Book> books = new HashSet<>();
+    private List<Book> books = new ArrayList<>();
 
     protected Author() {}
 
@@ -43,8 +43,8 @@ public class Author {
         return name;
     }
 
-    public Set<Book> getBooks() {
+    public List<Book> getBooks() {
         return books;
     }
-    
+
 }

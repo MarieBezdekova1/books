@@ -1,4 +1,4 @@
-package com.bezdekova.bookstore;
+package com.bezdekova.bookstore.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
     private String name;
