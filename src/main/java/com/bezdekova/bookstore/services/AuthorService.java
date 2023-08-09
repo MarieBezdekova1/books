@@ -24,6 +24,11 @@ public class AuthorService {
 
     public List<AuthorWithBooksDto> getAllAuthorsWithBooks() {
         List<Author> authors = authorRepository.findAll();
+        return authorDtoMapper.authorsToAuthorsWithBooksDtos(authors);
+    }
+
+    public List<AuthorDto> getAllAuthors() {
+        List<Author> authors = authorRepository.findAll();
         return authorDtoMapper.authorsToAuthorsDtos(authors);
     }
 

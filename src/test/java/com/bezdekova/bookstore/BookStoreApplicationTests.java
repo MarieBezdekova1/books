@@ -80,7 +80,7 @@ class BookStoreApplicationTests {
         assertNotNull(responseBody, "Response should not be null.");
 
         String authorExpected = "{\"name\":\"Alois Jirasek\",\"books\":[" + book3 + "]}";
-        JSONAssert.assertEquals(authorExpected.toString(), responseBody, false);
+        JSONAssert.assertEquals(authorExpected, responseBody, false);
     }
 
     @Test
@@ -94,15 +94,14 @@ class BookStoreApplicationTests {
         String responseBody = response.getBody();
         assertNotNull(responseBody, "Response should not be null.");
 
-        JSONAssert.assertEquals(book3.toString(), responseBody, false);
+        JSONAssert.assertEquals(book3, responseBody, false);
     }
 
     @Transactional
     @Test
-    public void testCreateNewAuthor() throws JSONException {
+    public void testCreateNewAuthor() {
 
-        AuthorDto authorCreateDTO = new AuthorDto();
-        authorCreateDTO.setName("Karel Capek");
+        AuthorDto authorCreateDTO = new AuthorDto("Karel Capek");
         Author createdAuthor = new Author("Karel Capek");
         createdAuthor.setId(3L);
 
@@ -127,7 +126,7 @@ class BookStoreApplicationTests {
 
     @Transactional
     @Test
-    public void testCreateNewBook() throws JSONException {
+    public void testCreateNewBook() {
         BookCreateDto bookCreateDto = new BookCreateDto();
         bookCreateDto.setName("Temno");
         bookCreateDto.setPrice(320);

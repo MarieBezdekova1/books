@@ -9,11 +9,14 @@ import com.bezdekova.bookstore.db.Book;
 import com.bezdekova.bookstore.repositories.AuthorRepository;
 import com.bezdekova.bookstore.repositories.BookRepository;
 import com.bezdekova.bookstore.services.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("books")
+@Tag(name = "Books", description = "Book APIs")
 public class BookController {
 
     private final BookRepository bookRepository;
@@ -27,6 +30,9 @@ public class BookController {
         this.bookService = bookService;
     }
 
+    @Operation(
+            summary = "Retrieve all books",
+            tags = { "books", "get" })
     @GetMapping
     public ResponseEntity<List<BookDto>> getAllBooks() {
         List<BookDto> books = bookService.getAllBooks();
