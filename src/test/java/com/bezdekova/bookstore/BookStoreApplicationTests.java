@@ -4,16 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.bezdekova.bookstore.db.Author;
 import com.bezdekova.bookstore.model.dto.AuthorDto;
+import com.bezdekova.bookstore.model.dto.BookCreateDto;
+import com.bezdekova.bookstore.model.dto.BookDto;
+import com.bezdekova.bookstore.repositories.AuthorRepository;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(classes = BookStoreApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BookStoreApplicationTests {
@@ -22,6 +28,9 @@ class BookStoreApplicationTests {
     private int port;
 
     TestRestTemplate restTemplate = new TestRestTemplate();
+
+    @Autowired
+    AuthorRepository authorRepository;
 
     private final String book1 = "{\"name\":\"Babicka\",\"price\":150}";
     private final String book2 = "{\"name\":\"Diva Bara\",\"price\":450}";
@@ -88,35 +97,67 @@ class BookStoreApplicationTests {
         JSONAssert.assertEquals(book3.toString(), responseBody, false);
     }
 
+    @Transactional
     @Test
-    public void testCreateNewAuthos() throws JSONException {
+    public void testCreateNewAuthor() throws JSONException {
 
         AuthorDto authorCreateDTO = new AuthorDto();
         authorCreateDTO.setName("Karel Capek");
         Author createdAuthor = new Author("Karel Capek");
-        //createdAuthor.setId(3L);
-        String authorJson = "{\"id\":3,\"name\":\"Karel Capek\",\"books\":[]}";
+        createdAuthor.setId(3L);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         HttpEntity<AuthorDto> request = new HttpEntity<>(authorCreateDTO, headers);
 
-        //ResponseEntity<String> response = executeCall("/authors", HttpMethod.POST);
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<Author> response = restTemplate.exchange(
                 "http://localhost:" + port + "/authors",
                 HttpMethod.POST,
                 request,
-               // Author.class
-                String.class
+                Author.class
         );
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Response should be 201.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
 
-        String responseBody = response.getBody();
-        assertNotNull(responseBody, "Response should not be null.");
+        Author responseAuthor = response.getBody();
+        assertNotNull(responseAuthor, "Response should not be null.");
+        assertEquals(createdAuthor, responseAuthor, "Created author is not correct.");
+    }
 
-        JSONAssert.assertEquals(authorJson.toString(), responseBody, false);
+    @Transactional
+    @Test
+    public void testCreateNewBook() throws JSONException {
+        BookCreateDto bookCreateDto = new BookCreateDto();
+        bookCreateDto.setName("Temno");
+        bookCreateDto.setPrice(320);
+        bookCreateDto.setAuthorId(1L);
+
+        Optional<Author> author = authorRepository.findById(1L);
+        BookDto createdBook;
+        if (author.isPresent()) {
+            createdBook = new BookDto("Temno",320);
+        } else {
+            throw new RuntimeException("Author by id=1 not found in DB.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<BookCreateDto> request = new HttpEntity<>(bookCreateDto, headers);
+
+        ResponseEntity<BookDto> response = restTemplate.exchange(
+                "http://localhost:" + port + "/books",
+                HttpMethod.POST,
+                request,
+                BookDto.class
+        );
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Response should be 201.");
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
+
+        BookDto responseBook = response.getBody();
+        assertNotNull(responseBook, "Response should not be null.");
+        assertEquals(createdBook, responseBook, "Created author is not correct.");
     }
 
     private ResponseEntity<String> executeCall(String uri, HttpMethod method) {

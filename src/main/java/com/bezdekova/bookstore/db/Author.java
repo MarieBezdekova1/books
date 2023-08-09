@@ -2,6 +2,7 @@ package com.bezdekova.bookstore.db;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -39,6 +40,10 @@ public class Author {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -47,4 +52,16 @@ public class Author {
         return books;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Author author = (Author) o;
+        return Objects.equals(id, author.id) && Objects.equals(name, author.name) && Objects.equals(books, author.books);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, books);
+    }
 }
