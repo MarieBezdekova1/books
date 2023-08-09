@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import com.bezdekova.bookstore.db.Author;
 import com.bezdekova.bookstore.model.dto.AuthorDto;
+import com.bezdekova.bookstore.model.dto.AuthorNoBooksDto;
 import com.bezdekova.bookstore.model.dto.BookCreateDto;
 import com.bezdekova.bookstore.model.dto.BookDto;
 import com.bezdekova.bookstore.repositories.AuthorRepository;
@@ -19,8 +20,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.DirtiesContext;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(classes = BookStoreApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BookStoreApplicationTests {
 
@@ -97,7 +99,6 @@ class BookStoreApplicationTests {
         JSONAssert.assertEquals(book3, responseBody, false);
     }
 
-    @Transactional
     @Test
     public void testCreateNewAuthor() {
 
@@ -124,7 +125,6 @@ class BookStoreApplicationTests {
         assertEquals(createdAuthor, responseAuthor, "Created author is not correct.");
     }
 
-    @Transactional
     @Test
     public void testCreateNewBook() {
         BookCreateDto bookCreateDto = new BookCreateDto();
@@ -156,13 +156,69 @@ class BookStoreApplicationTests {
 
         BookDto responseBook = response.getBody();
         assertNotNull(responseBook, "Response should not be null.");
-        assertEquals(createdBook, responseBook, "Created author is not correct.");
+        assertEquals(createdBook, responseBook, "Created book is not correct.");
     }
 
     private ResponseEntity<String> executeCall(String uri, HttpMethod method) {
         return restTemplate.exchange(
             "http://localhost:" + port + uri,
             method, null, String.class);
+    }
+
+    @Test
+    public void testUpdateAuthorName() {
+        AuthorDto authorUpdateDto = new AuthorDto("Alois Jirasek II.");
+        AuthorNoBooksDto updatedAuthor = new AuthorNoBooksDto(1L, "Alois Jirasek II.");
+        updatedAuthor.setId(1L);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<AuthorDto> request = new HttpEntity<>(authorUpdateDto, headers);
+
+        ResponseEntity<AuthorNoBooksDto> response = restTemplate.exchange(
+                "http://localhost:" + port + "/authors/1",
+                HttpMethod.PUT,
+                request,
+                AuthorNoBooksDto.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
+
+        AuthorNoBooksDto responseAuthor = response.getBody();
+        assertNotNull(responseAuthor, "Response should not be null.");
+        assertEquals(updatedAuthor, responseAuthor, "Updated author is not correct.");
+    }
+
+    @Test
+    public void testUpdateBookNameAndPrice() {
+        BookDto bookUpdateDto = new BookDto("Psohlavci 2.", 320);
+
+        Optional<Author> author = authorRepository.findById(1L);
+        BookDto createdBook;
+        if (author.isPresent()) {
+            createdBook = new BookDto("Psohlavci 2.",320);
+        } else {
+            throw new RuntimeException("Author by id=1 not found in DB.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<BookDto> request = new HttpEntity<>(bookUpdateDto, headers);
+
+        ResponseEntity<BookDto> response = restTemplate.exchange(
+                "http://localhost:" + port + "/books/1",
+                HttpMethod.PUT,
+                request,
+                BookDto.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
+
+        BookDto responseBook = response.getBody();
+        assertNotNull(responseBook, "Response should not be null.");
+        assertEquals(createdBook, responseBook, "Updated book is not correct.");
     }
 
 }

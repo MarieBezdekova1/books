@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorService {
@@ -39,5 +40,17 @@ public class AuthorService {
     public Author createAuthor(AuthorDto authorDto) {
         Author author = new Author(authorDto.getName());
         return authorRepository.save(author);
+    }
+
+    public Author updateAuthor(Long id, AuthorDto authorDto) {
+        Optional<Author> optionalAuthor = authorRepository.findById(id);
+
+        if (optionalAuthor.isPresent()) {
+            Author author = optionalAuthor.get();
+            author.setName(authorDto.getName());
+            return authorRepository.save(author);
+        } else {
+            return null;
+        }
     }
 }

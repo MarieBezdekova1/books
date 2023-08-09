@@ -6,8 +6,6 @@ import java.util.List;
 import com.bezdekova.bookstore.model.dto.BookCreateDto;
 import com.bezdekova.bookstore.model.dto.BookDto;
 import com.bezdekova.bookstore.db.Book;
-import com.bezdekova.bookstore.repositories.AuthorRepository;
-import com.bezdekova.bookstore.repositories.BookRepository;
 import com.bezdekova.bookstore.services.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,14 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Books", description = "Book APIs")
 public class BookController {
 
-    private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository;
-
     private final BookService bookService;
 
-    BookController(BookRepository bookRepository, AuthorRepository authorRepository, BookService bookService) {
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
+    BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
@@ -54,6 +47,17 @@ public class BookController {
     public ResponseEntity<Book> createBook(@RequestBody BookCreateDto bookCreateDto) {
         Book createdBook = bookService.createBook(bookCreateDto);
         return ResponseEntity.created(URI.create("/api/books/" + createdBook.getId())).body(createdBook);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
+        Book updatedBook = bookService.updateBook(id, bookDto);
+
+        if (updatedBook != null) {
+            return ResponseEntity.ok(updatedBook);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
     
 }

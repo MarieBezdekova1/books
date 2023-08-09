@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -43,5 +44,18 @@ public class BookService {
 
         Book book = new Book(bookDto.getName(), author, bookDto.getPrice());
         return bookRepository.save(book);
+    }
+
+    public Book updateBook(Long id, BookDto bookDto) {
+        Optional<Book> optionalBook = bookRepository.findById(id);
+
+        if (optionalBook.isPresent()) {
+            Book book = optionalBook.get();
+            book.setName(bookDto.getName());
+            book.setPrice(bookDto.getPrice());
+            return bookRepository.save(book);
+        } else {
+            return null;
+        }
     }
 }

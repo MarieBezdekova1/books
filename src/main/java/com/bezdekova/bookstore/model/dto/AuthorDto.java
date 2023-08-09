@@ -4,6 +4,9 @@ public class AuthorDto {
 
     private String name;
 
+    public AuthorDto() {
+    }
+
     public AuthorDto(String name) {
         this.name = name;
     }

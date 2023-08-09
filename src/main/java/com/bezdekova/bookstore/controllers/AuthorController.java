@@ -17,12 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("authors")
 @Tag(name = "Authors", description = "Author APIs")
 public class AuthorController {
-
-    private final AuthorRepository repository;
     private final AuthorService authorService;
 
-    AuthorController(AuthorRepository repository, AuthorService authorService) {
-        this.repository = repository;
+    AuthorController(AuthorService authorService) {
         this.authorService = authorService;
     }
 
@@ -59,6 +56,17 @@ public class AuthorController {
     public ResponseEntity<Author> createAuthor(@RequestBody AuthorDto authorDto) {
         Author createdAuthor = authorService.createAuthor(authorDto);
         return ResponseEntity.created(URI.create("/authors/" + createdAuthor.getId())).body(createdAuthor);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Author> updateAuthor(@PathVariable Long id, @RequestBody AuthorDto authorDto) {
+        Author updatedAuthor = authorService.updateAuthor(id, authorDto);
+
+        if (updatedAuthor != null) {
+            return ResponseEntity.ok(updatedAuthor);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
    
 }

@@ -48,6 +48,10 @@ public class Author {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<Book> getBooks() {
         return books;
     }
