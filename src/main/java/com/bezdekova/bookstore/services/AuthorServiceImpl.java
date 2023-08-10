@@ -5,6 +5,7 @@ import com.bezdekova.bookstore.mappers.AuthorDtoMapper;
 import com.bezdekova.bookstore.model.dto.AuthorDto;
 import com.bezdekova.bookstore.model.dto.AuthorWithBooksDto;
 import com.bezdekova.bookstore.repositories.AuthorRepository;
+import com.bezdekova.bookstore.services.api.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AuthorService {
+public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
     private final AuthorDtoMapper authorDtoMapper;
 
     @Autowired
-    public AuthorService(AuthorRepository authorRepository, AuthorDtoMapper authorDtoMapper) {
+    public AuthorServiceImpl(AuthorRepository authorRepository, AuthorDtoMapper authorDtoMapper) {
         this.authorRepository = authorRepository;
         this.authorDtoMapper = authorDtoMapper;
     }

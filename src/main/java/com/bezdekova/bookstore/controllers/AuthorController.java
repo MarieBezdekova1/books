@@ -1,35 +1,45 @@
 package com.bezdekova.bookstore.controllers;
 
+import com.bezdekova.bookstore.constant.Mapping;
+import com.bezdekova.bookstore.mappers.response.AuthorResponseMapper;
+import com.bezdekova.bookstore.model.response.AuthorResponse;
+import com.bezdekova.bookstore.services.api.AuthorService;
 import java.net.URI;
 import java.util.List;
 
 import com.bezdekova.bookstore.model.dto.AuthorDto;
-import com.bezdekova.bookstore.model.dto.AuthorWithBooksDto;
 import com.bezdekova.bookstore.db.Author;
-import com.bezdekova.bookstore.repositories.AuthorRepository;
-import com.bezdekova.bookstore.services.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("authors")
+// ideálně toto smazat a řešit to per EP
+@RequestMapping(Mapping.AUTHORS)
 @Tag(name = "Authors", description = "Author APIs")
 public class AuthorController {
     private final AuthorService authorService;
+    private final AuthorResponseMapper authorResponseMapper;
 
-    AuthorController(AuthorService authorService) {
+    AuthorController(AuthorService authorService, AuthorResponseMapper authorResponseMapper) {
         this.authorService = authorService;
+        this.authorResponseMapper = authorResponseMapper;
     }
 
     @Operation(
             summary = "Retrieve all authors with their books",
             tags = { "authors", "get" })
     @GetMapping
-    public ResponseEntity<List<AuthorWithBooksDto>> getAllAuthorsWithBooks() {
-        List<AuthorWithBooksDto> authorsWithBooks = authorService.getAllAuthorsWithBooks();
-        return ResponseEntity.ok(authorsWithBooks);
+    // používat response status a response objekty
+    @ResponseStatus(HttpStatus.OK)
+    public List<AuthorResponse> getAllAuthorsWithBooks() {
+        return authorService.getAllAuthorsWithBooks()
+            .stream()
+            .map(authorResponseMapper::map)
+            .toList();
     }
 
     @Operation(
@@ -37,7 +47,7 @@ public class AuthorController {
             tags = { "authors", "get" })
     @GetMapping("/only")
     public ResponseEntity<List<AuthorDto>> getAllAuthors() {
-        List<AuthorDto> authors = authorService.getAllAuthors();
+        var authors = authorService.getAllAuthors();
         return ResponseEntity.ok(authors);
     }
 
@@ -45,10 +55,12 @@ public class AuthorController {
     public ResponseEntity<Author> getAuthor(@PathVariable Long id) {
         Author author = authorService.getAuthorById(id);
 
+        // přesun do service pomocí exceptions -- throw new NotFoundException (tvoje vlastní exception)
         if (author != null) {
             return ResponseEntity.ok(author);
         } else {
-            return ResponseEntity.notFound().build();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            //return ResponseEntity.notFound().build();
         }
     }
 
