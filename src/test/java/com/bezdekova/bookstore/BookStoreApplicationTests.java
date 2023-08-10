@@ -104,7 +104,7 @@ class BookStoreApplicationTests {
 
         AuthorDto authorCreateDTO = new AuthorDto("Karel Capek");
         Author createdAuthor = new Author("Karel Capek");
-        createdAuthor.setId(3L);
+        createdAuthor.setId(3);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
@@ -165,6 +165,7 @@ class BookStoreApplicationTests {
             method, null, String.class);
     }
 
+    @DirtiesContext
     @Test
     public void testUpdateAuthorName() {
         AuthorDto authorUpdateDto = new AuthorDto("Alois Jirasek II.");
@@ -190,6 +191,7 @@ class BookStoreApplicationTests {
         assertEquals(updatedAuthor, responseAuthor, "Updated author is not correct.");
     }
 
+    @DirtiesContext
     @Test
     public void testUpdateBookNameAndPrice() {
         BookDto bookUpdateDto = new BookDto("Psohlavci 2.", 320);

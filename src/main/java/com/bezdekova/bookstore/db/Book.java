@@ -18,7 +18,7 @@ public class Book {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @JsonIgnore
-    private Long id;
+    private Integer id;
     private String name;
     private Integer price;
 
@@ -40,11 +40,11 @@ public class Book {
         return String.format("Book[id=%d, name=%s, author=%s, price=%d]", id, name, author.getName(), price);
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

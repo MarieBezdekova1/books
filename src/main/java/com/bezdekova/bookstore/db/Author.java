@@ -19,7 +19,7 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String name;
     @OneToMany(mappedBy = "author", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)     
@@ -36,11 +36,11 @@ public class Author {
         return String.format("Author[id=%d, name=%s, books=%s]", id, name, books);
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
