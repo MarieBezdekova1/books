@@ -1,72 +1,69 @@
 package com.bezdekova.bookstore.controllers;
 
-import java.net.URI;
-import java.util.List;
-
-import com.bezdekova.bookstore.model.dto.AuthorDto;
-import com.bezdekova.bookstore.model.dto.AuthorWithBooksDto;
-import com.bezdekova.bookstore.db.Author;
-import com.bezdekova.bookstore.repositories.AuthorRepository;
-import com.bezdekova.bookstore.services.AuthorService;
+import com.bezdekova.bookstore.constant.MappingConstants;
+import com.bezdekova.bookstore.mappers.response.AuthorResponseMapper;
+import com.bezdekova.bookstore.model.request.AuthorRequest;
+import com.bezdekova.bookstore.model.response.AuthorResponse;
+import com.bezdekova.bookstore.model.response.AuthorWithBooksResponse;
+import com.bezdekova.bookstore.services.api.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("authors")
 @Tag(name = "Authors", description = "Author APIs")
 public class AuthorController {
     private final AuthorService authorService;
+    private final AuthorResponseMapper authorResponseMapper;
 
-    AuthorController(AuthorService authorService) {
+    AuthorController(AuthorService authorService, AuthorResponseMapper authorResponseMapper) {
         this.authorService = authorService;
+        this.authorResponseMapper = authorResponseMapper;
     }
 
     @Operation(
             summary = "Retrieve all authors with their books",
             tags = { "authors", "get" })
-    @GetMapping
-    public ResponseEntity<List<AuthorWithBooksDto>> getAllAuthorsWithBooks() {
-        List<AuthorWithBooksDto> authorsWithBooks = authorService.getAllAuthorsWithBooks();
-        return ResponseEntity.ok(authorsWithBooks);
+    @GetMapping(MappingConstants.AUTHORS)
+    @ResponseStatus(HttpStatus.OK)
+    public List<AuthorWithBooksResponse> getAllAuthorsWithBooks() {
+        return authorService.getAllAuthorsWithBooks()
+                .stream()
+                .map(authorResponseMapper::map)
+                .toList();
     }
 
     @Operation(
             summary = "Retrieve all authors (without books' details)",
             tags = { "authors", "get" })
-    @GetMapping("/only")
-    public ResponseEntity<List<AuthorDto>> getAllAuthors() {
-        List<AuthorDto> authors = authorService.getAllAuthors();
-        return ResponseEntity.ok(authors);
+    @GetMapping(MappingConstants.AUTHORS_ONLY)
+    @ResponseStatus(HttpStatus.OK)
+    public List<AuthorResponse> getAllAuthors() {
+        return authorService.getAllAuthors()
+                .stream()
+                .map(authorResponseMapper::map2)
+                .toList();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Author> getAuthor(@PathVariable Long id) {
-        Author author = authorService.getAuthorById(id);
-
-        if (author != null) {
-            return ResponseEntity.ok(author);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping(MappingConstants.AUTHORS + "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthorWithBooksResponse getAuthor(@PathVariable Long id) {
+        return  authorResponseMapper.map(authorService.getAuthorById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Author> createAuthor(@RequestBody AuthorDto authorDto) {
-        Author createdAuthor = authorService.createAuthor(authorDto);
-        return ResponseEntity.created(URI.create("/authors/" + createdAuthor.getId())).body(createdAuthor);
+    @PostMapping(MappingConstants.AUTHORS)
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthorWithBooksResponse createAuthor(@RequestBody AuthorRequest authorRequest) {
+        return authorResponseMapper.map(authorService.createAuthor(authorRequest));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Author> updateAuthor(@PathVariable Long id, @RequestBody AuthorDto authorDto) {
-        Author updatedAuthor = authorService.updateAuthor(id, authorDto);
-
-        if (updatedAuthor != null) {
-            return ResponseEntity.ok(updatedAuthor);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping(MappingConstants.AUTHORS + "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthorWithBooksResponse updateAuthor(@PathVariable Long id, @RequestBody AuthorRequest authorRequest) {
+        return authorResponseMapper.map(authorService.updateAuthor(id, authorRequest));
     }
    
 }

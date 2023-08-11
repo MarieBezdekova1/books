@@ -1,63 +1,58 @@
 package com.bezdekova.bookstore.controllers;
 
-import java.net.URI;
-import java.util.List;
-
-import com.bezdekova.bookstore.model.dto.BookCreateDto;
-import com.bezdekova.bookstore.model.dto.BookDto;
-import com.bezdekova.bookstore.db.Book;
-import com.bezdekova.bookstore.services.BookService;
+import com.bezdekova.bookstore.constant.MappingConstants;
+import com.bezdekova.bookstore.mappers.response.BookResponseMapper;
+import com.bezdekova.bookstore.model.request.BookCreateRequest;
+import com.bezdekova.bookstore.model.request.BookUpdateRequest;
+import com.bezdekova.bookstore.model.response.BookResponse;
+import com.bezdekova.bookstore.services.api.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("books")
 @Tag(name = "Books", description = "Book APIs")
 public class BookController {
 
     private final BookService bookService;
+    private final BookResponseMapper bookResponseMapper;
 
-    BookController(BookService bookService) {
+    BookController(BookService bookService, BookResponseMapper bookResponseMapper) {
         this.bookService = bookService;
+        this.bookResponseMapper = bookResponseMapper;
     }
 
     @Operation(
             summary = "Retrieve all books",
             tags = { "books", "get" })
-    @GetMapping
-    public ResponseEntity<List<BookDto>> getAllBooks() {
-        List<BookDto> books = bookService.getAllBooks();
-        return ResponseEntity.ok(books);
+    @GetMapping(MappingConstants.BOOKS)
+    @ResponseStatus(HttpStatus.OK)
+    public List<BookResponse> getAllBooks() {
+        return bookService.getAllBooks()
+                .stream()
+                .map(bookResponseMapper::map)
+                .toList();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Book> getBook(@PathVariable Long id) {
-        Book book = bookService.getBookById(id);
-
-        if (book != null) {
-            return ResponseEntity.ok(book);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(MappingConstants.BOOKS + "/{id}")
+    public BookResponse getBook(@PathVariable Integer id) {
+        return bookResponseMapper.map(bookService.getBookById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody BookCreateDto bookCreateDto) {
-        Book createdBook = bookService.createBook(bookCreateDto);
-        return ResponseEntity.created(URI.create("/api/books/" + createdBook.getId())).body(createdBook);
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(MappingConstants.BOOKS)
+    public BookResponse createBook(@RequestBody BookCreateRequest bookCreateRequest) {
+        return bookResponseMapper.map(bookService.createBook(bookCreateRequest));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
-        Book updatedBook = bookService.updateBook(id, bookDto);
-
-        if (updatedBook != null) {
-            return ResponseEntity.ok(updatedBook);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(MappingConstants.BOOKS + "/{id}")
+    public BookResponse updateBook(@PathVariable Integer id, @RequestBody BookUpdateRequest bookUpdateRequest) {
+        return bookResponseMapper.map(bookService.updateBook(id, bookUpdateRequest));
     }
     
 }

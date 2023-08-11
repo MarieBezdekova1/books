@@ -1,6 +1,6 @@
 package com.bezdekova.bookstore.model.dto;
 
-public record AuthorNoBooksDto(
+public record AuthorWithIdNoBooksDto(
         String name
 ) {
 }
