@@ -50,7 +50,7 @@ public class AuthorController {
 
     @GetMapping(MappingConstants.AUTHORS + "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public AuthorWithBooksResponse getAuthor(@PathVariable Long id) {
+    public AuthorWithBooksResponse getAuthor(@PathVariable Integer id) {
         return  authorResponseMapper.map(authorService.getAuthorById(id));
     }
 
@@ -62,7 +62,7 @@ public class AuthorController {
 
     @PutMapping(MappingConstants.AUTHORS + "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public AuthorWithBooksResponse updateAuthor(@PathVariable Long id, @RequestBody AuthorRequest authorRequest) {
+    public AuthorWithBooksResponse updateAuthor(@PathVariable Integer id, @RequestBody AuthorRequest authorRequest) {
         return authorResponseMapper.map(authorService.updateAuthor(id, authorRequest));
     }
    
