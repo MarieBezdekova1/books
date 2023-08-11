@@ -37,9 +37,12 @@ public class BookServiceImpl implements BookService {
     }
 
     public Book createBook(BookCreateRequest bookCreateRequest) {
+        // lepší používat var
         Author author = authorRepository.findById(bookCreateRequest.authorId())
                 .orElseThrow(() -> new EntityNotFoundException("Author not found"));
 
+        // toto by se ideálně mělo přesunout do nově vzniklého AuthorDomainMapperu (podobně jako AuthorResponseMapper bude vytvářet jen objekt)
+        // lepší používat var
         Book book = new Book(bookCreateRequest.name(), author, bookCreateRequest.price());
         return bookRepository.save(book);
     }
@@ -48,6 +51,8 @@ public class BookServiceImpl implements BookService {
         Optional<Book> optionalBook = bookRepository.findById(id);
 
         if (optionalBook.isPresent()) {
+            // toto by se ideálně mělo přesunout do nově vzniklého AuthorDomainMapperu (podobně jako AuthorResponseMapper bude vytvářet jen objekt)
+            // lepší používat var
             Book book = optionalBook.get();
             book.setName(bookUpdateRequest.name());
             book.setPrice(bookUpdateRequest.price());

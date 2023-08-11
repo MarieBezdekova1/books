@@ -27,6 +27,7 @@ public class AuthorController {
     @Operation(
             summary = "Retrieve all authors with their books",
             tags = { "authors", "get" })
+    // chybí tu mapping MappingConstants - nejspíš jsi to jen nepushnula
     @GetMapping(MappingConstants.AUTHORS)
     @ResponseStatus(HttpStatus.OK)
     public List<AuthorWithBooksResponse> getAllAuthorsWithBooks() {

@@ -28,6 +28,7 @@ public class BookController {
     @Operation(
             summary = "Retrieve all books",
             tags = { "books", "get" })
+    // chybí tu mapping MappingConstants - nejspíš jsi to jen nepushnula
     @GetMapping(MappingConstants.BOOKS)
     @ResponseStatus(HttpStatus.OK)
     public List<BookResponse> getAllBooks() {

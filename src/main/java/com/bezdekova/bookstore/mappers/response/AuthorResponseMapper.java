@@ -14,6 +14,7 @@ public class AuthorResponseMapper {
         this.bookResponseMapper = bookResponseMapper;
     }
 
+    // tady použít něco jako MapFull, další funkce může být jen map, ať je z názvu jasné, co přesně to dělá
     public AuthorWithBooksResponse map(Author author) {
         return new AuthorWithBooksResponse(
                 author.getName(),

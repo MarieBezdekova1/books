@@ -10,9 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+// před každým commitem zkus zkontrolovat, zda vše zformátované a nejsou tu nepoužité importy - IDEA by to měla umět automaticky jako warningy
 import java.util.Optional;
 
 @Service
+/**
+ * trochu mi všude chybí logování - v těchto funkcích ideálně na úrovni debug - jen pro vývojáře. Error tu zatím nikde neřešíš (máš exceptions) a info tady je zbytečné
+ */
 public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
@@ -36,14 +40,18 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     public Author createAuthor(AuthorRequest authorRequest) {
-        Author author = new Author(authorRequest.name());
+        // lepší používat var
+        var author = new Author(authorRequest.name());
         return authorRepository.save(author);
     }
 
     public Author updateAuthor(Integer id, AuthorRequest authorRequest) {
-        Optional<Author> optionalAuthor = authorRepository.findById(id);
+        // lepší používat var
+        var optionalAuthor = authorRepository.findById(id);
 
         if (optionalAuthor.isPresent()) {
+            // toto by se ideálně mělo přesunout do nově vzniklého AuthorDomainMapperu (podobně jako AuthorResponseMapper bude vytvářet jen objekt)
+            // lepší používat var
             Author author = optionalAuthor.get();
             author.setName(authorRequest.name());
             return authorRepository.save(author);

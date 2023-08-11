@@ -1,3 +1,7 @@
+val postgresVersion: String by project
+val flywayVersion: String by project
+val openApiVersion: String by project
+
 plugins {
     java
     id("org.springframework.boot") version "3.1.2"
@@ -8,12 +12,15 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web:3.1.2")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.2")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
-    runtimeOnly("org.postgresql:postgresql:42.6.0")
-    implementation("org.flywaydb:flyway-core:9.16.3")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.2")
+    // tady je pak dobré ve větších projektech používat proměnné pro verze. Například tady je vidět, že Spring je tu ve verzi 3.1.2
+    val springVersion = "3.1.2"
+    implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
+    // nebo se to taky občas definuje globálně v gradle.properties - to je na tobě, jak se ti to dělá líp.
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiVersion")
+    runtimeOnly("org.postgresql:postgresql:$postgresVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
 }
 
 group = "com.bezdekova"
