@@ -1,7 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.1.0"
-    //id("io.spring.dependency-management") version "1.1.2"
+    id("org.springframework.boot") version "3.1.2"
 }
 
 repositories {
@@ -9,12 +8,12 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web:3.1.0")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.0")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.1.2")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.1.2")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
     runtimeOnly("org.postgresql:postgresql:42.6.0")
     implementation("org.flywaydb:flyway-core:9.16.3")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.2")
 }
 
 group = "com.bezdekova"
