@@ -1,16 +1,12 @@
 package com.bezdekova.bookstore;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.List;
-import java.util.Optional;
-
+import com.bezdekova.bookstore.constant.MappingConstants;
 import com.bezdekova.bookstore.db.Author;
-import com.bezdekova.bookstore.model.dto.AuthorDto;
-import com.bezdekova.bookstore.model.dto.AuthorNoBooksDto;
-import com.bezdekova.bookstore.model.dto.BookCreateDto;
-import com.bezdekova.bookstore.model.dto.BookDto;
+import com.bezdekova.bookstore.model.request.AuthorRequest;
+import com.bezdekova.bookstore.model.request.BookCreateRequest;
+import com.bezdekova.bookstore.model.request.BookUpdateRequest;
+import com.bezdekova.bookstore.model.response.AuthorResponse;
+import com.bezdekova.bookstore.model.response.BookResponse;
 import com.bezdekova.bookstore.repositories.AuthorRepository;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -21,6 +17,12 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest(classes = BookStoreApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -41,7 +43,7 @@ class BookStoreApplicationTests {
     @Test
     public void testRetrieveAllBooks() throws JSONException {
 
-        ResponseEntity<String> response = executeCall("/books", HttpMethod.GET);
+        ResponseEntity<String> response = executeCall(MappingConstants.BOOKS, HttpMethod.GET);
         
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");   
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
@@ -56,7 +58,7 @@ class BookStoreApplicationTests {
     @Test
     public void testRetrieveAllAuthorsWithBooks() throws JSONException {
 
-        ResponseEntity<String> response = executeCall("/authors", HttpMethod.GET);
+        ResponseEntity<String> response = executeCall(MappingConstants.AUTHORS, HttpMethod.GET);
         
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");   
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
@@ -73,7 +75,7 @@ class BookStoreApplicationTests {
     @Test
     public void testRetrieveOneAuthorWithBook() throws JSONException {
 
-        ResponseEntity<String> response = executeCall("/authors/1", HttpMethod.GET);
+        ResponseEntity<String> response = executeCall(MappingConstants.AUTHORS + "/1", HttpMethod.GET);
 
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
@@ -88,7 +90,7 @@ class BookStoreApplicationTests {
     @Test
     public void testRetrieveOneBook() throws JSONException {
 
-        ResponseEntity<String> response = executeCall("/books/1", HttpMethod.GET);
+        ResponseEntity<String> response = executeCall(MappingConstants.BOOKS + "/1", HttpMethod.GET);
 
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
@@ -102,91 +104,88 @@ class BookStoreApplicationTests {
     @Test
     public void testCreateNewAuthor() {
 
-        AuthorDto authorCreateDTO = new AuthorDto("Karel Capek");
-        Author createdAuthor = new Author("Karel Capek");
-        createdAuthor.setId(3);
+        AuthorRequest authorCreateRequest = new AuthorRequest("Karel Capek");
+        AuthorResponse createdAuthor = new AuthorResponse("Karel Capek");
+        //createdAuthor.setId(3);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<AuthorDto> request = new HttpEntity<>(authorCreateDTO, headers);
+        HttpEntity<AuthorRequest> request = new HttpEntity<>(authorCreateRequest, headers);
 
-        ResponseEntity<Author> response = restTemplate.exchange(
-                "http://localhost:" + port + "/authors",
+        ResponseEntity<AuthorResponse> response = restTemplate.exchange(
+                "http://localhost:" + port + "/" + MappingConstants.AUTHORS,
                 HttpMethod.POST,
                 request,
-                Author.class
+                AuthorResponse.class
         );
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Response should be 201.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
 
-        Author responseAuthor = response.getBody();
+        AuthorResponse responseAuthor = response.getBody();
         assertNotNull(responseAuthor, "Response should not be null.");
         assertEquals(createdAuthor, responseAuthor, "Created author is not correct.");
     }
 
     @Test
     public void testCreateNewBook() {
-        BookCreateDto bookCreateDto = new BookCreateDto();
-        bookCreateDto.setName("Temno");
-        bookCreateDto.setPrice(320);
-        bookCreateDto.setAuthorId(1L);
+        BookCreateRequest bookCreateRequest = new BookCreateRequest("Temno", 320, 1);
 
-        Optional<Author> author = authorRepository.findById(1L);
-        BookDto createdBook;
+        Optional<Author> author = authorRepository.findById(1);
+        BookResponse createdBook;
         if (author.isPresent()) {
-            createdBook = new BookDto("Temno",320);
+            createdBook = new BookResponse("Temno",320);
         } else {
             throw new RuntimeException("Author by id=1 not found in DB.");
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<BookCreateDto> request = new HttpEntity<>(bookCreateDto, headers);
+        HttpEntity<BookCreateRequest> request = new HttpEntity<>(bookCreateRequest, headers);
 
-        ResponseEntity<BookDto> response = restTemplate.exchange(
-                "http://localhost:" + port + "/books",
+        ResponseEntity<BookResponse> response = restTemplate.exchange(
+                "http://localhost:" + port + "/" + MappingConstants.BOOKS,
                 HttpMethod.POST,
                 request,
-                BookDto.class
+                BookResponse.class
         );
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Response should be 201.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
 
-        BookDto responseBook = response.getBody();
+        BookResponse responseBook = response.getBody();
         assertNotNull(responseBook, "Response should not be null.");
         assertEquals(createdBook, responseBook, "Created book is not correct.");
     }
 
     private ResponseEntity<String> executeCall(String uri, HttpMethod method) {
         return restTemplate.exchange(
-            "http://localhost:" + port + uri,
+            "http://localhost:" + port + "/" + uri,
             method, null, String.class);
     }
 
     @DirtiesContext
     @Test
     public void testUpdateAuthorName() {
-        AuthorDto authorUpdateDto = new AuthorDto("Alois Jirasek II.");
-        AuthorNoBooksDto updatedAuthor = new AuthorNoBooksDto(1L, "Alois Jirasek II.");
-        updatedAuthor.setId(1L);
+        AuthorRequest authorRequest = new AuthorRequest("Alois Jirasek II.");
+        AuthorResponse updatedAuthor = new AuthorResponse("Alois Jirasek II.");
+        //updatedAuthor.id = 1;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<AuthorDto> request = new HttpEntity<>(authorUpdateDto, headers);
+        HttpEntity<AuthorRequest> request = new HttpEntity<>(authorRequest, headers);
 
-        ResponseEntity<AuthorNoBooksDto> response = restTemplate.exchange(
-                "http://localhost:" + port + "/authors/1",
+        ResponseEntity<AuthorResponse> response = restTemplate.exchange(
+                "http://localhost:" + port + "/" + MappingConstants.AUTHORS + "/1",
                 HttpMethod.PUT,
                 request,
-                AuthorNoBooksDto.class
+                AuthorResponse.class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
 
-        AuthorNoBooksDto responseAuthor = response.getBody();
+        AuthorResponse responseAuthor = response.getBody();
         assertNotNull(responseAuthor, "Response should not be null.");
         assertEquals(updatedAuthor, responseAuthor, "Updated author is not correct.");
     }
@@ -194,31 +193,31 @@ class BookStoreApplicationTests {
     @DirtiesContext
     @Test
     public void testUpdateBookNameAndPrice() {
-        BookDto bookUpdateDto = new BookDto("Psohlavci 2.", 320);
+        BookUpdateRequest bookUpdateRequest = new BookUpdateRequest("Psohlavci 2.", 320);
 
-        Optional<Author> author = authorRepository.findById(1L);
-        BookDto createdBook;
+        Optional<Author> author = authorRepository.findById(1);
+        BookResponse createdBook;
         if (author.isPresent()) {
-            createdBook = new BookDto("Psohlavci 2.",320);
+            createdBook = new BookResponse("Psohlavci 2.",320);
         } else {
             throw new RuntimeException("Author by id=1 not found in DB.");
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        HttpEntity<BookDto> request = new HttpEntity<>(bookUpdateDto, headers);
+        HttpEntity<BookUpdateRequest> request = new HttpEntity<>(bookUpdateRequest, headers);
 
-        ResponseEntity<BookDto> response = restTemplate.exchange(
-                "http://localhost:" + port + "/books/1",
+        ResponseEntity<BookResponse> response = restTemplate.exchange(
+                "http://localhost:" + port + "/" + MappingConstants.BOOKS + "/1",
                 HttpMethod.PUT,
                 request,
-                BookDto.class
+                BookResponse.class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response should be 200.");
         assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType(), "Type should be application/json.");
 
-        BookDto responseBook = response.getBody();
+        BookResponse responseBook = response.getBody();
         assertNotNull(responseBook, "Response should not be null.");
         assertEquals(createdBook, responseBook, "Updated book is not correct.");
     }
